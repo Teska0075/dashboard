@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 // @mui
@@ -11,7 +10,6 @@ import {
   Paper,
   Avatar,
   Button,
-  Popover,
   Checkbox,
   TableRow,
   MenuItem,
@@ -19,12 +17,14 @@ import {
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
+  Rating,
 } from '@mui/material';
 // components
-import Label from '../components/label';
+import Edit from '../components/editCategory/Edit';
+import AddCategory from '../components/addCategory/AddCategory';
+// import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
@@ -39,7 +39,7 @@ const TABLE_HEAD = [
   { id: 'description', label: 'Тайлбар', alignRight: false },
   { id: 'categoryImg', label: 'Зураг', alignRight: false },
   { id: 'catgegoryRating', label: 'Үнэлгээ', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
+  // { id: 'role', label: 'Role', alignRight: false },
   { id: '' },
 ];
 
@@ -77,7 +77,9 @@ function applySortFilter(array, comparator, query) {
 export default function UserPage() {
   const [categories, setCategory] = useState([]);
 
-  const [open, setOpen] = useState(null);
+  const [showModal1, setShowModal1] = useState(false);
+
+  const [showModal2, setShowModal2] = useState(false);
 
   const [page, setPage] = useState(0);
 
@@ -91,13 +93,13 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(2);
 
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
+  const openModal1 = () => setShowModal1(true);
 
-  const handleCloseMenu = () => {
-    setOpen(null);
-  };
+  const closeModal1 = () => setShowModal1(false);
+
+  const openModal2 = () => setShowModal2(true);
+
+  const closeModal2 = () => setShowModal2(false);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -143,6 +145,11 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
+  const handleEdit = () => {
+    openModal1();
+    console.log('EDIT');
+  };
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
   const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
@@ -151,7 +158,19 @@ export default function UserPage() {
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
-  useEffect(() => {
+  const handleDelete = (id) => {
+    axios
+      .delete(`http://localhost:8000/category/${id}`)
+      .then((res) => {
+        console.log(res.data);
+        render();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const render = () => {
     axios
       .get('http://localhost:8000/category')
       .then((res) => {
@@ -162,7 +181,9 @@ export default function UserPage() {
       .catch((err) => {
         console.log('Err', err);
       });
-  }, []);
+  };
+
+  useEffect(render, []);
 
   return (
     <>
@@ -175,7 +196,13 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Категори
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button
+            variant="contained"
+            startIcon={<Iconify icon="eva:plus-fill" />}
+            onClick={() => {
+              openModal2();
+            }}
+          >
             Шинэ Категори Үүсгэх
           </Button>
         </Stack>
@@ -203,35 +230,63 @@ export default function UserPage() {
 
                       // selected={selectedUser}
                       return (
-                        <TableRow hover key={_id} tabIndex={-1} role="checkbox">
-                          <TableCell padding="checkbox">
-                            <Checkbox checked={false} onChange={(event) => handleClick(event, title)} />
-                          </TableCell>
+                        <>
+                          <TableRow hover key={_id} tabIndex={-1} role="checkbox">
+                            <TableCell padding="checkbox">
+                              <Checkbox checked={false} onChange={(event) => handleClick(event, title)} />
+                            </TableCell>
 
-                          <TableCell component="th" scope="row" padding="none">
-                            <Stack direction="row" alignItems="center" spacing={2}>
-                              <Avatar alt={title} src={categoryImg} />
-                              <Typography variant="subtitle2" noWrap>
-                                {title}
-                              </Typography>
-                            </Stack>
-                          </TableCell>
+                            <TableCell component="th" scope="row" padding="none">
+                              <Stack direction="row" alignItems="center" spacing={2}>
+                                <Avatar alt={title} src={categoryImg} />
+                                <Typography variant="subtitle2" noWrap>
+                                  {title}
+                                </Typography>
+                              </Stack>
+                            </TableCell>
 
-                          <TableCell align="left">{description}</TableCell>
+                            <TableCell align="left">{description}</TableCell>
 
-                          <TableCell align="left">url</TableCell>
+                            <TableCell align="left">url</TableCell>
 
-                          <TableCell align="left">
-                            {/* <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
-                            {categoryRating}
-                          </TableCell>
+                            <TableCell align="left">
+                              {/* <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
 
-                          <TableCell align="right">
-                            <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                              <Rating name="half-rating-read" defaultValue={categoryRating} precision={0.5} readOnly>
+                                {categoryRating}
+                              </Rating>
+                            </TableCell>
+
+                            <TableCell align="right" sx={{ display: 'flex' }}>
+                              {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
                               <Iconify icon={'eva:more-vertical-fill'} />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
+                            </IconButton> */}
+                              <Button
+                                sx={{ color: 'error.main' }}
+                                onClick={() => {
+                                  handleDelete(_id);
+                                }}
+                              >
+                                <Iconify icon={'eva:trash-2-fill'} sx={{ mr: 2 }} />
+                                Delete
+                              </Button>
+                              <Button onClick={handleEdit}>
+                                <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+                                Edit
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                          <Edit
+                            open={showModal1}
+                            handleClose={closeModal1}
+                            title={title}
+                            description={description}
+                            categoryImg={categoryImg}
+                            categoryRating={categoryRating}
+                            id={_id}
+                            render={render}
+                          />
+                        </>
                       );
                     })}
                     {emptyRows > 0 && (
@@ -280,35 +335,7 @@ export default function UserPage() {
           </Card>
         )}
       </Container>
-
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Засах
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Устгах
-        </MenuItem>
-      </Popover>
+      <AddCategory open={showModal2} handleClose={closeModal2} />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React } from 'react';
 import axios from 'axios';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -19,27 +19,14 @@ const style = {
   gap: 3,
 };
 
-export default function BasicModal({ open, handleClose, id, title, description, categoryImg, categoryRating, render }) {
-  const [changeTitle, setChangeTitle] = useState(title);
+export default function BasicModal({ open, handleClose,  category, setCategory,render,setRender }) {
 
-  const [changeDesc, setChangeDesc] = useState(description);
-
-  const [changeCategoryImg, setChangeCategoryImg] = useState(categoryImg);
-
-  const [changeCategoryRating, setChangeCategoryRating] = useState(categoryRating);
-
-  const handleSet = (id) => {
-    console.log(id);
+  const handleSet = () => {
     axios
-      .put(`http://localhost:8000/category/${id}`, {
-        title: changeTitle,
-        description: changeDesc,
-        categoryImg: changeCategoryImg,
-        categoryRating: changeCategoryRating,
-      })
-      .then((res) => {
-        console.log(res.data);
-        render();
+      .put(`http://localhost:8000/category/${category._id}`, {category})
+      .then((req,res) => {
+        setRender(!render);
+        handleClose();
       })
       .catch((error) => {
         console.log(error);
@@ -56,43 +43,43 @@ export default function BasicModal({ open, handleClose, id, title, description, 
             fullWidth
             id="outlined-controlled"
             label="Title"
-            defaultValue={title}
+            defaultValue={category.title}
             onChange={(e) => {
-              setChangeTitle(e.target.value);
+              setCategory({...category, [e.target.name]: e.target.value})
             }}
           />
           <TextField
             fullWidth
             id="outlined-controlled"
             label="Description"
-            defaultValue={description}
+            defaultValue={category.description}
             onChange={(e) => {
-              setChangeDesc(e.target.value);
+              setCategory({...category, [e.target.name]: e.target.value})
             }}
           />
           <TextField
             fullWidth
             id="outlined-controlled"
             label="Image"
-            defaultValue={categoryImg}
+            defaultValue={category.categoryImg}
             onChange={(e) => {
-              setChangeCategoryImg(e.target.value);
+              setCategory({...category, [e.target.name]: e.target.value})
             }}
           />
           <TextField
             fullWidth
             id="outlined-controlled"
             label="Rating"
-            defaultValue={categoryRating}
+            defaultValue={category.categoryRating}
             onChange={(e) => {
-              setChangeCategoryRating(e.target.value);
+              setCategory({...category, [e.target.name]: e.target.value})
             }}
           />
           <Button
             variant="contained"
             color="primary"
             onClick={() => {
-              handleSet(id);
+              handleSet();
             }}
           >
             Done

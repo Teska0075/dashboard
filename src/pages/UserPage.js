@@ -75,7 +75,14 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function UserPage() {
-  const [categories, setCategory] = useState([]);
+
+  const [fileteredCategory, setFilteredCategory] = useState([]);
+
+  const [categories, setCategories] = useState([]);
+
+  const [category,setCategory]=useState({})
+
+  const [render,setRender] = useState(false)
 
   const [showModal1, setShowModal1] = useState(false);
 
@@ -93,13 +100,19 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(2);
 
-  const openModal1 = () => setShowModal1(true);
+  // const openModal1 = () => setShowModal1(true);
 
   const closeModal1 = () => setShowModal1(false);
 
   const openModal2 = () => setShowModal2(true);
 
   const closeModal2 = () => setShowModal2(false);
+
+  const handleEdit = (category) => {
+    setShowModal1(true);
+    setCategory(category)
+
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -145,16 +158,11 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
-  const handleEdit = () => {
-    openModal1();
-    console.log('EDIT');
-  };
+  
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
   const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
-
-  const [fileteredCategory, setFilteredCategory] = useState([]);
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
@@ -163,27 +171,29 @@ export default function UserPage() {
       .delete(`http://localhost:8000/category/${id}`)
       .then((res) => {
         console.log(res.data);
-        render();
+        getCategory();
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const render = () => {
+  const getCategory = () => {
     axios
       .get('http://localhost:8000/category')
       .then((res) => {
-        setCategory(res.data.categories);
+        setCategories(res.data.categories);
         setFilteredCategory(res.data.categories);
-        console.log('CAT IRLEE', categories);
+        console.log('CAT IRLEE', res.data.categories);
       })
       .catch((err) => {
         console.log('Err', err);
       });
   };
 
-  useEffect(render, []);
+  useEffect(() => {
+    getCategory()
+  },[])
 
   return (
     <>
@@ -269,21 +279,11 @@ export default function UserPage() {
                               <Iconify icon={'eva:trash-2-fill'} sx={{ mr: 2 }} />
                               Delete
                             </Button>
-                            <Button onClick={handleEdit}>
+                            <Button onClick={handleEdit(row)}>
                               <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
                               Edit
                             </Button>
                           </TableCell>
-                          {/* <Edit
-                              open={showModal1}
-                              handleClose={closeModal1}
-                              title={title}
-                              description={description}
-                              categoryImg={categoryImg}
-                              categoryRating={categoryRating}
-                              id={_id}
-                              render={render}
-                            /> */}
                         </TableRow>
                       );
                     })}
@@ -337,12 +337,10 @@ export default function UserPage() {
       <Edit
         open={showModal1}
         handleClose={closeModal1}
-        // title={title}
-        // description={description}
-        // categoryImg={categoryImg}
-        // categoryRating={categoryRating}
-        // id={_id}
+        category={category}
+        setCategory={setCategory}
         render={render}
+        setRender={setRender}
       />
     </>
   );

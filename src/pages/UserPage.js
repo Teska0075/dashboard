@@ -174,9 +174,9 @@ export default function UserPage() {
     axios
       .get('http://localhost:8000/category')
       .then((res) => {
-        console.log('CAT IRLEE', res.data.categories);
         setCategory(res.data.categories);
         setFilteredCategory(res.data.categories);
+        console.log('CAT IRLEE', categories);
       })
       .catch((err) => {
         console.log('Err', err);
@@ -230,63 +230,61 @@ export default function UserPage() {
 
                       // selected={selectedUser}
                       return (
-                        <>
-                          <TableRow hover key={_id} tabIndex={-1} role="checkbox">
-                            <TableCell padding="checkbox">
-                              <Checkbox checked={false} onChange={(event) => handleClick(event, title)} />
-                            </TableCell>
+                        <TableRow hover key={_id} tabIndex={-1} role="checkbox">
+                          <TableCell padding="checkbox">
+                            <Checkbox checked={false} onChange={(event) => handleClick(event, title)} />
+                          </TableCell>
 
-                            <TableCell component="th" scope="row" padding="none">
-                              <Stack direction="row" alignItems="center" spacing={2}>
-                                <Avatar alt={title} src={categoryImg} />
-                                <Typography variant="subtitle2" noWrap>
-                                  {title}
-                                </Typography>
-                              </Stack>
-                            </TableCell>
+                          <TableCell component="th" scope="row" padding="none">
+                            <Stack direction="row" alignItems="center" spacing={2}>
+                              <Avatar alt={title} src={categoryImg} />
+                              <Typography variant="subtitle2" noWrap>
+                                {title}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
 
-                            <TableCell align="left">{description}</TableCell>
+                          <TableCell align="left">{description}</TableCell>
 
-                            <TableCell align="left">url</TableCell>
+                          <TableCell align="left">url</TableCell>
 
-                            <TableCell align="left">
-                              {/* <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
+                          <TableCell align="left">
+                            {/* <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
 
-                              <Rating name="half-rating-read" defaultValue={categoryRating} precision={0.5} readOnly>
-                                {categoryRating}
-                              </Rating>
-                            </TableCell>
+                            <Rating name="half-rating-read" defaultValue={categoryRating} precision={0.5} readOnly>
+                              {categoryRating}
+                            </Rating>
+                          </TableCell>
 
-                            <TableCell align="right" sx={{ display: 'flex' }}>
-                              {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <TableCell align="right" sx={{ display: 'flex' }}>
+                            {/* <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton> */}
-                              <Button
-                                sx={{ color: 'error.main' }}
-                                onClick={() => {
-                                  handleDelete(_id);
-                                }}
-                              >
-                                <Iconify icon={'eva:trash-2-fill'} sx={{ mr: 2 }} />
-                                Delete
-                              </Button>
-                              <Button onClick={handleEdit}>
-                                <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-                                Edit
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                          <Edit
-                            open={showModal1}
-                            handleClose={closeModal1}
-                            title={title}
-                            description={description}
-                            categoryImg={categoryImg}
-                            categoryRating={categoryRating}
-                            id={_id}
-                            render={render}
-                          />
-                        </>
+                            <Button
+                              sx={{ color: 'error.main' }}
+                              onClick={() => {
+                                handleDelete(_id);
+                              }}
+                            >
+                              <Iconify icon={'eva:trash-2-fill'} sx={{ mr: 2 }} />
+                              Delete
+                            </Button>
+                            <Button onClick={handleEdit}>
+                              <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+                              Edit
+                            </Button>
+                          </TableCell>
+                          {/* <Edit
+                              open={showModal1}
+                              handleClose={closeModal1}
+                              title={title}
+                              description={description}
+                              categoryImg={categoryImg}
+                              categoryRating={categoryRating}
+                              id={_id}
+                              render={render}
+                            /> */}
+                        </TableRow>
                       );
                     })}
                     {emptyRows > 0 && (
@@ -336,6 +334,16 @@ export default function UserPage() {
         )}
       </Container>
       <AddCategory open={showModal2} handleClose={closeModal2} />
+      <Edit
+        open={showModal1}
+        handleClose={closeModal1}
+        // title={title}
+        // description={description}
+        // categoryImg={categoryImg}
+        // categoryRating={categoryRating}
+        // id={_id}
+        render={render}
+      />
     </>
   );
 }

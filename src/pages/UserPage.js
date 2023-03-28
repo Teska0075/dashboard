@@ -12,7 +12,6 @@ import {
   Button,
   Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
@@ -75,14 +74,13 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function UserPage() {
-
   const [fileteredCategory, setFilteredCategory] = useState([]);
 
   const [categories, setCategories] = useState([]);
 
-  const [category,setCategory]=useState({})
+  const [category, setCategory] = useState({});
 
-  const [render,setRender] = useState(false)
+  const [render, setRender] = useState(false);
 
   const [showModal1, setShowModal1] = useState(false);
 
@@ -100,18 +98,13 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(2);
 
-  // const openModal1 = () => setShowModal1(true);
-
   const closeModal1 = () => setShowModal1(false);
-
-  const openModal2 = () => setShowModal2(true);
 
   const closeModal2 = () => setShowModal2(false);
 
   const handleEdit = (category) => {
     setShowModal1(true);
-    setCategory(category)
-
+    setCategory(category);
   };
 
   const handleRequestSort = (event, property) => {
@@ -158,8 +151,6 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
-  
-
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
   const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
@@ -192,8 +183,8 @@ export default function UserPage() {
   };
 
   useEffect(() => {
-    getCategory()
-  },[])
+    getCategory();
+  }, [render]);
 
   return (
     <>
@@ -210,7 +201,7 @@ export default function UserPage() {
             variant="contained"
             startIcon={<Iconify icon="eva:plus-fill" />}
             onClick={() => {
-              openModal2();
+              setShowModal2(true);
             }}
           >
             Шинэ Категори Үүсгэх

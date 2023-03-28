@@ -1,27 +1,45 @@
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import axios from 'axios';
 // @mui
-import { Container, Stack, Typography } from '@mui/material';
+import { Container, Stack, Typography, Button } from '@mui/material';
 // components
+import Iconify from '../components/iconify';
 import { ProductSort, ProductList, ProductCartWidget, ProductFilterSidebar } from '../sections/@dashboard/products';
+import TravelProvider, { TravelContext } from '../context/travelContext';
+
 // mock
-import PRODUCTS from '../_mock/products';
+// import PRODUCTS from '../_mock/products';
 
 // ----------------------------------------------------------------------
 
 export default function ProductsPage() {
-  const [openFilter, setOpenFilter] = useState(false);
+  const [render, setRender] = useState(false);
 
-  const handleOpenFilter = () => {
-    setOpenFilter(true);
+  const [travels, setTravels] = useState([]);
+
+  const [filteredTravel, setFilteredTravel] = useState([]);
+
+  const getTravel = () => {
+    axios
+      .get('http://localhost:8000/travel')
+      .then((res) => {
+        console.log('TRAVEL', res.data);
+        setTravels(res.data.travels);
+        setFilteredTravel(res.data.travels);
+        console.log('SetTravels', travels);
+        console.log('FTravels', filteredTravel);
+      })
+      .catch((err) => {
+        console.log('Error', err);
+      });
   };
 
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
-
+  useEffect(() => {
+    getTravel();
+  }, [render]);
   return (
-    <>
+    <TravelProvider>
       <Helmet>
         <title> Dashboard: Products | Minimal UI </title>
       </Helmet>
@@ -33,18 +51,39 @@ export default function ProductsPage() {
 
         <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
           <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-            <ProductFilterSidebar
+            <Button
+              variant="contained"
+              startIcon={<Iconify icon="eva:plus-fill" />}
+              onClick={() => {
+                console.log('first');
+              }}
+            >
+              Шинэ Аялал Үүсгэх
+            </Button>
+
+            {/* <ProductFilterSidebar
               openFilter={openFilter}
               onOpenFilter={handleOpenFilter}
               onCloseFilter={handleCloseFilter}
             />
-            <ProductSort />
+
+            <ProductSort /> */}
           </Stack>
         </Stack>
 
-        <ProductList products={PRODUCTS} />
-        <ProductCartWidget />
+        <ProductList filteredTravel={filteredTravel} />
+        {/* <ProductCartWidget /> */}
       </Container>
-    </>
+    </TravelProvider>
   );
 }
+
+// const [openFilter, setOpenFilter] = useState(false);
+
+// const handleOpenFilter = () => {
+//   setOpenFilter(true);
+// };
+
+// const handleCloseFilter = () => {
+//   setOpenFilter(false);
+// };

@@ -184,7 +184,7 @@ export default function UserPage() {
 
   useEffect(() => {
     getCategory();
-  }, [render]);
+  }, []);
 
   return (
     <>

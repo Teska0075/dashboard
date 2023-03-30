@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 // components
 import Edit from '../components/editCategory/Edit';
-import AddCategory from '../components/addCategory/AddCategory';
+// import AddCategory from '../components/addCategory/AddCategory';
 // import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -78,13 +78,17 @@ export default function UserPage() {
 
   const [categories, setCategories] = useState([]);
 
-  const [category, setCategory] = useState({});
+  const [categoryData, setCategoryData] = useState({});
 
   const [render, setRender] = useState(false);
 
   const [showModal1, setShowModal1] = useState(false);
 
-  const [showModal2, setShowModal2] = useState(false);
+  // const [showModal2, setShowModal2] = useState(false);
+
+  const [newCategory, setNewCategory] = useState(false);
+
+  const [submit, setSubmit] = useState(false);
 
   const [page, setPage] = useState(0);
 
@@ -98,13 +102,16 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(2);
 
-  const closeModal1 = () => setShowModal1(false);
+  // const closeModal1 = () => setShowModal1(false);
 
-  const closeModal2 = () => setShowModal2(false);
+  // const closeModal2 = () => setShowModal2(false);
 
-  const handleEdit = (category) => {
-    setShowModal1(true);
-    setCategory(category);
+  // const handleEdit = () => {
+  //   setShowModal1(true);
+  // };
+
+  const closeModal = () => {
+    setShowModal1(!showModal1);
   };
 
   const handleRequestSort = (event, property) => {
@@ -176,6 +183,7 @@ export default function UserPage() {
         setCategories(res.data.categories);
         setFilteredCategory(res.data.categories);
         console.log('CAT IRLEE', res.data.categories);
+        console.log(fileteredCategory);
       })
       .catch((err) => {
         console.log('Err', err);
@@ -184,7 +192,7 @@ export default function UserPage() {
 
   useEffect(() => {
     getCategory();
-  }, []);
+  }, [render]);
 
   return (
     <>
@@ -201,7 +209,9 @@ export default function UserPage() {
             variant="contained"
             startIcon={<Iconify icon="eva:plus-fill" />}
             onClick={() => {
-              setShowModal2(true);
+              setShowModal1(!showModal1);
+              // setCatData({ name: 'New Category' });
+              setNewCategory(true);
             }}
           >
             Шинэ Категори Үүсгэх
@@ -265,12 +275,20 @@ export default function UserPage() {
                               sx={{ color: 'error.main' }}
                               onClick={() => {
                                 handleDelete(_id);
+                                setCategoryData({ ...row });
                               }}
                             >
                               <Iconify icon={'eva:trash-2-fill'} sx={{ mr: 2 }} />
                               Delete
                             </Button>
-                            <Button onClick={handleEdit(row)}>
+                            <Button
+                              onClick={(row) => {
+                                setShowModal1(true);
+                                setCategoryData({ ...row });
+                                setNewCategory(false);
+                                console.log(categoryData);
+                              }}
+                            >
                               <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
                               Edit
                             </Button>
@@ -324,15 +342,20 @@ export default function UserPage() {
           </Card>
         )}
       </Container>
-      <AddCategory open={showModal2} handleClose={closeModal2} />
-      <Edit
-        open={showModal1}
-        handleClose={closeModal1}
-        category={category}
-        setCategory={setCategory}
-        render={render}
-        setRender={setRender}
-      />
+      {/* <AddCategory open={showModal2} handleClose={closeModal2} /> */}
+      {showModal1 && (
+        <Edit
+          open={showModal1}
+          closeModal={closeModal}
+          // handleClose={closeModal1}
+          categoryData={categoryData}
+          setCategoryData={setCategoryData}
+          newCategory={newCategory}
+          submit={submit}
+          setSubmit={setSubmit}
+          getCategory={getCategory}
+        />
+      )}
     </>
   );
 }

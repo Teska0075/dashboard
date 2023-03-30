@@ -1,4 +1,4 @@
-import { React } from 'react';
+import { React, useState } from 'react';
 import axios from 'axios';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -19,67 +19,112 @@ const style = {
   gap: 3,
 };
 
-export default function BasicModal({ open, handleClose,  category, setCategory,render,setRender }) {
+export default function BasicModal({
+  open,
+  closeModal,
+  categoryData,
+  setCategoryData,
+  newCategory,
+  submit,
+  setSubmit,
+  getCategory,
+}) {
+  const [newCategoryObj, setNewCategoryObj] = useState({
+    title: '',
+    description: '',
+    categoryImg: '',
+    categoryRating: '',
+  });
 
-  const handleSet = () => {
+  const changeHandler = (e) => {
+    if (newCategory) {
+      setNewCategoryObj({ ...newCategoryObj, [e.target.name]: e.target.value });
+    } else {
+      setCategoryData({ ...categoryData, [e.target.name]: e.target.value });
+    }
+  };
+
+  const updateCategory = () => {
     axios
-      .put(`http://localhost:8000/category/${category._id}`, {category})
-      .then((req,res) => {
-        setRender(!render);
-        handleClose();
+      .put(`http://localhost:8000/category/${categoryData._id}`, { categoryData })
+      .then((req, res) => {
+        // setRender(!render);
+        // handleClose();
       })
       .catch((error) => {
-        console.log(error);
+        console.log('ERROR ', error);
       });
-    handleClose();
+    closeModal();
+    getCategory();
+  };
+
+  const addCategory = async ({ newCategoryObj }) => {
+    try {
+      const res = await axios.post(`http://localhost:8000/category`, newCategoryObj);
+    } catch (error) {
+      console.log('error', error);
+    }
+    closeModal();
+    getCategory();
   };
 
   return (
     <div>
       {/* <Button onClick={handleOpen}>Open modal</Button> */}
-      <Modal keepMounted open={open} onClose={handleClose}>
+      <Modal keepMounted open={open} onClose={closeModal}>
         <Box component="form" sx={style}>
           <TextField
             fullWidth
             id="outlined-controlled"
             label="Title"
-            defaultValue={category.title}
-            onChange={(e) => {
-              setCategory({...category, [e.target.name]: e.target.value})
-            }}
+            name="title"
+            value={newCategory ? newCategoryObj.title : categoryData.title}
+            onChange={changeHandler}
           />
           <TextField
             fullWidth
             id="outlined-controlled"
             label="Description"
-            defaultValue={category.description}
-            onChange={(e) => {
-              setCategory({...category, [e.target.name]: e.target.value})
-            }}
+            name="description"
+            value={newCategory ? newCategoryObj.description : categoryData.description}
+            onChange={changeHandler}
           />
           <TextField
             fullWidth
             id="outlined-controlled"
+            type="file"
             label="Image"
-            defaultValue={category.categoryImg}
-            onChange={(e) => {
-              setCategory({...category, [e.target.name]: e.target.value})
+            name="categoryImg"
+            value={newCategory ? newCategoryObj.categoryImg : categoryData.categoryImg}
+            onChange={async (e) => {
+              console.log(e.target.files[0]);
+              const imgData = new FormData();
+              imgData.append('image', e.target.files[0]);
+              const res = await axios.post('http://localhost:8000/uploads', imgData);
+              console.log(res.data.imgUrl);
+              setNewCategoryObj({ ...newCategoryObj, categoryImg: res.data.imgUrl });
             }}
           />
           <TextField
             fullWidth
             id="outlined-controlled"
             label="Rating"
-            defaultValue={category.categoryRating}
-            onChange={(e) => {
-              setCategory({...category, [e.target.name]: e.target.value})
-            }}
+            name="categoryRating"
+            value={newCategory ? newCategoryObj.categoryRating : categoryData.categoryRating}
+            onChange={changeHandler}
           />
           <Button
             variant="contained"
             color="primary"
             onClick={() => {
-              handleSet();
+              if (newCategory) {
+                console.log('add');
+                addCategory({ newCategoryObj });
+              } else {
+                console.log('update');
+                updateCategory();
+                console.log(...categoryData);
+              }
             }}
           >
             Done

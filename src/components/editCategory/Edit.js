@@ -46,7 +46,7 @@ export default function BasicModal({
 
   const updateCategory = () => {
     axios
-      .put(`http://localhost:8000/category/${categoryData._id}`, { categoryData })
+      .put(`http://localhost:8008/category/${categoryData._id}`, { categoryData })
       .then((req, res) => {
         // setRender(!render);
         // handleClose();
@@ -60,7 +60,7 @@ export default function BasicModal({
 
   const addCategory = async ({ newCategoryObj }) => {
     try {
-      const res = await axios.post(`http://localhost:8000/category`, newCategoryObj);
+      const res = await axios.post(`http://localhost:8008/category`, newCategoryObj);
     } catch (error) {
       console.log('error', error);
     }

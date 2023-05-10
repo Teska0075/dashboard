@@ -22,7 +22,7 @@ export default function ProductsPage() {
 
   const getTravel = () => {
     axios
-      .get('http://localhost:8000/travel')
+      .get('http://localhost:8080/travel')
       .then((res) => {
         console.log('TRAVEL', res.data);
         setTravels(res.data.travels);

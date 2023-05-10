@@ -20,7 +20,7 @@ export default function LoginForm() {
 
   const handleClick = async () => {
     try {
-      const result = await axios.post('http://localhost:8000/users/login', { email, password });
+      const result = await axios.post('http://localhost:8080/users/signin', { email, password });
       console.log(result);
       setUser(result.data.user);
       navigate('/dashboard', { replace: true });

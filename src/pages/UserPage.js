@@ -166,7 +166,7 @@ export default function UserPage() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8000/category/${id}`)
+      .delete(`http://localhost:8080/category/${id}`)
       .then((res) => {
         console.log(res.data);
         getCategory();
@@ -178,7 +178,7 @@ export default function UserPage() {
 
   const getCategory = () => {
     axios
-      .get('http://localhost:8000/category')
+      .get('http://localhost:8080/category')
       .then((res) => {
         setCategories(res.data.categories);
         setFilteredCategory(res.data.categories);
